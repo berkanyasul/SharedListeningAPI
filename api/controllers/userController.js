@@ -35,18 +35,37 @@ exports.getUsers = function(req,res){
 };
 
 exports.createUser = function(req,res){
+    var id = req.params.userID;
     var obj = {
-        username:"Test",
+        userID:id,
         last_updated: new Date(),
-        location:{
-            type:'Point',
-            coordinates:[0,0]
-        }
+        location:{}
 
     };
+    if(req.body.location){
+        obj.location.type = "Point";
+        obj.location.coordinates = req.body.location;
+    }
+
     if(req.body.username){
         obj.username = req.body.username;
     }
+    if(req.body.song && req.body.song.spotifyURI){
+        var song = {
+            spotifyURI:req.body.song.spotifyURI
+        };
+        if(req.body.song.interpret){
+            song.interpret = req.body.song.interpret;
+        }
+        if(req.body.song.album){
+            song.album = req.body.song.album;
+        }
+        if(req.body.song.titel){
+            song.titel = req.body.song.titel;
+        }
+        obj.song = song;
+    }
+
 
     var user = new User(obj);
     user.save(function(err, user) {
@@ -57,31 +76,44 @@ exports.createUser = function(req,res){
 };
 
 exports.updateUser = function(req,res){
-    var id = req.params.user_id;
-    var update = {
-        last_update: new Date(),
-        location : {}
-    };
-    if(req.body.location){
-        update.location.type = "Point";
-        update.location.coordinates = req.body.location;
-    }
-    if(req.body.song && req.body.song.titel){
-        var song = {
-            titel:req.body.song.titel
-        };
-        if(req.body.song.interpret){
-            song.interpret = req.body.song.interpret;
-        }
-        if(req.body.song.album){
-            song.album = req.body.song.album;
-        }
-        update.song = song;
-    }
-    User.findByIdAndUpdate(id,update,{new: true},function(err,update){
+    var id = req.params.userID;
+    User.findOne({"userID" : id},function(err,user){
         if(err){
             res.send(err)
         }
-        res.json(update)
+        if(!user){
+            module.exports.createUser(req,res);
+        }else{
+            var update = {
+                last_update: new Date(),
+                location : {}
+            };
+            if(req.body.location){
+                update.location.type = "Point";
+                update.location.coordinates = req.body.location;
+            }
+            if(req.body.song && req.body.song.spotifyURI){
+                var song = {
+                    spotifyURI:req.body.song.spotifyURI
+                };
+                if(req.body.song.interpret){
+                    song.interpret = req.body.song.interpret;
+                }
+                if(req.body.song.album){
+                    song.album = req.body.song.album;
+                }
+                if(req.body.song.titel){
+                    song.titel = req.body.song.titel;
+                }
+                update.song = song;
+            }
+            User.findOneAndUpdate({userID:id},update,function(err,updatedUser){
+                if(err){
+                    res.send(err)
+                }
+                res.json(updatedUser)
+            })
+        }
     })
-}
+
+};

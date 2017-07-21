@@ -9,10 +9,13 @@ var Schema = mongoose.Schema;
 var UserSchema = new Schema({
     username: String,
     last_updated:Date,
+    userID:String,
     song:{
         titel:String,
         interpret:String,
-        album:String
+        album:String,
+        spotifyURI:String,
+
     },
     location: {
         type: { type: String },
