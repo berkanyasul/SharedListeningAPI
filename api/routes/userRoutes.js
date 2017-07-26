@@ -19,6 +19,7 @@ module.exports = function(app) {
         });
     app.route('/users/:userID')
         .put(function(req,res){
+            console.log("put from : "+req.params.userID)
            userController.updateUser(req,res)
         })
 };

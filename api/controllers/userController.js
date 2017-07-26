@@ -42,26 +42,27 @@ exports.createUser = function(req,res){
         location:{}
 
     };
-    if(req.body.location){
+    if(req.body.latitude && req.body.longitude){
         obj.location.type = "Point";
-        obj.location.coordinates = req.body.location;
+        obj.location.coordinates = [req.body.longitude,req.body.latitude];
     }
 
     if(req.body.username){
         obj.username = req.body.username;
     }
-    if(req.body.song && req.body.song.spotifyURI){
+
+    if(req.body.spotifyURI){
         var song = {
-            spotifyURI:req.body.song.spotifyURI
+            spotifyURI:req.body.spotifyURI
         };
-        if(req.body.song.interpret){
-            song.interpret = req.body.song.interpret;
+        if(req.body.interpret){
+            song.interpret = req.body.interpret;
         }
-        if(req.body.song.album){
-            song.album = req.body.song.album;
+        if(req.body.album){
+            song.album = req.body.album;
         }
-        if(req.body.song.titel){
-            song.titel = req.body.song.titel;
+        if(req.body.titel){
+            song.titel = req.body.titel;
         }
         obj.song = song;
     }
@@ -88,26 +89,26 @@ exports.updateUser = function(req,res){
                 last_update: new Date(),
                 location : {}
             };
-            if(req.body.location){
+            if(req.body.latitude && req.body.longitude){
                 update.location.type = "Point";
-                update.location.coordinates = req.body.location;
+                update.location.coordinates = [req.body.longitude,req.body.latitude];
             }
-            if(req.body.song && req.body.song.spotifyURI){
+            if(req.body.spotifyURI){
                 var song = {
-                    spotifyURI:req.body.song.spotifyURI
+                    spotifyURI:req.body.spotifyURI
                 };
-                if(req.body.song.interpret){
-                    song.interpret = req.body.song.interpret;
+                if(req.body.interpret){
+                    song.interpret = req.body.interpret;
                 }
-                if(req.body.song.album){
-                    song.album = req.body.song.album;
+                if(req.body.album){
+                    song.album = req.body.album;
                 }
-                if(req.body.song.titel){
-                    song.titel = req.body.song.titel;
+                if(req.body.titel){
+                    song.titel = req.body.titel;
                 }
                 update.song = song;
             }
-            User.findOneAndUpdate({userID:id},update,function(err,updatedUser){
+            User.findOneAndUpdate({userID:id},update,{new:true},function(err,updatedUser){
                 if(err){
                     res.send(err)
                 }
